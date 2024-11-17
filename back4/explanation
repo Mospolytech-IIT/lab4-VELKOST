@@ -1,0 +1,544 @@
+    - Функции связаны между собой через общие данные (`accounts`, `passwords`), что имитирует реальную банковскую систему.
+    - Примеры операций (вклад, снятие, перевод, аутентификация, открытие счета, смена пароля, подача заявки на кредит) являются реалистичными и отражают реальные действия в банковской системе.
+    - Код оформлен в соответствии с PEP 8.
+
+
+
+Шаг 1: Минимум 2 разные функции, которые принимают на вход один или несколько параметров. Функции ДОЛЖНЫ выбрасывать исключение при определённых значениях входных параметров. Функции НЕ ДОЛЖНЫ содержать никаких обработчиков исключений.
+
+ Реализация в коде:
+
+В файле `banking.py` реализованы две функции:
+
+1. `withdraw(account_number, amount)`
+
+    def withdraw(account_number, amount):
+        """
+        Шаг 1: Функция, которая выбрасывает исключение при недостатке средств.
+        """
+        if account_number not in accounts:
+            raise AccountNotFoundError(f"Счет {account_number} не найден.")
+        if amount > accounts[account_number]['balance']:
+            raise InsufficientFundsError("Недостаточно средств для снятия.")
+        accounts[account_number]['balance'] -= amount
+        return accounts[account_number]['balance']
+
+
+2. `deposit(account_number, amount)`
+
+    def deposit(account_number, amount):
+        """
+        Шаг 1: Функция, которая выбрасывает исключение при превышении лимита счета.
+        """
+        if account_number not in accounts:
+            raise AccountNotFoundError(f"Счет {account_number} не найден.")
+        if amount + accounts[account_number]['balance'] > accounts[account_number]['limit']:
+            raise TransactionLimitError("Сумма вклада превышает лимит счета.")
+        accounts[account_number]['balance'] += amount
+        return accounts[account_number]['balance']
+
+
+
+- Соответствие требованиям:
+    - Обе функции принимают необходимые параметры.
+    - Выбрасывают соответствующие исключения (`AccountNotFoundError`, `InsufficientFundsError`, `TransactionLimitError`) при определённых условиях.
+    - Не содержат обработчиков исключений внутри себя.
+
+---
+
+ Шаг 2: Функция, которая принимает на вход один или несколько параметров. Функция ДОЛЖНА выбрасывать исключение при определённых значениях входных параметров. Функция ДОЛЖНА содержать ОДИН обработчик исключений общего типа (Exception). Внутри блока обработки исключения ДОЛЖНА быть какая-нибудь логика, связанная с обработкой исключения. Обработчик НЕ ДОЛЖЕН содержать блок finally.
+
+ Реализация в коде:
+
+В файле `banking.py` реализована функция:
+
+`get_account_balance(account_number)`
+
+def get_account_balance(account_number):
+    """
+    Шаг 2: Функция с обработчиком общего типа исключений.
+    """
+    try:
+        balance = accounts[account_number]['balance']
+        return balance
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+         Логика обработки исключения
+        return None
+
+
+
+- Соответствие требованиям:
+    - Функция принимает один параметр `account_number`.
+    - При отсутствии счета или другой ошибке выбрасывает исключение.
+    - Содержит один обработчик исключений общего типа `Exception`.
+    - В блоке `except` реализована логика обработки (вывод сообщения и возврат `None`).
+    - Блок `finally` отсутствует.
+
+
+
+---
+
+ Шаг 3: Функция, которая принимает на вход один или несколько параметров. Функция ДОЛЖНА выбрасывать исключение при определённых значениях входных параметров. Функция ДОЛЖНА содержать ОДИН обработчик исключений общего типа (Exception). Внутри блока обработки исключения ДОЛЖНА быть какая-нибудь логика, связанная с обработкой исключения. Обработчик ДОЛЖЕН содержать блок finally. Логика внутри блока finally ДОЛЖНА способствовать нормальному завершению работы функции.
+
+ Реализация в коде:
+
+В файле `banking.py` реализована функция:
+
+`read_account_data(account_number)`
+
+def read_account_data(account_number):
+    """
+    Шаг 3: Функция с обработчиком общего типа исключений и блоком finally.
+    """
+    try:
+        if account_number not in accounts:
+            raise AccountNotFoundError(f"Счет {account_number} не найден.")
+         Дополнительная логика чтения данных счета
+        return accounts[account_number]
+    except Exception as e:
+        print(f"Произошла ошибка: {e}")
+         Логика обработки исключения
+        return None
+    finally:
+         Логика для нормального завершения работы функции
+        print("Завершено чтение данных счета.")
+
+
+
+- Соответствие требованиям:
+    - Функция принимает один параметр `account_number`.
+    - Выбрасывает исключение `AccountNotFoundError` при отсутствии счета.
+    - Содержит один обработчик исключений общего типа `Exception`.
+    - В блоке `except` реализована логика обработки (вывод сообщения и возврат `None`).
+    - Содержит блок `finally` с логикой нормального завершения (вывод сообщения).
+
+
+ Шаг 4: Минимум 3 разные функции, которые принимают на вход один или несколько параметров. Функции ДОЛЖНЫ выбрасывать исключения при определённых значениях входных параметров. Функции ДОЛЖНЫ содержать НЕСКОЛЬКО обработчиков РАЗНЫХ типов исключений (минимум 3 типа исключений). Внутри блоков обработки исключения ДОЛЖНА быть какая-нибудь логика, связанная с обработкой соответствующего типа исключения. Каждый обработчик МОЖЕТ содержать блок finally. Логика внутри блока finally ДОЛЖНА способствовать нормальному завершению работы функции.
+
+ Реализация в коде:
+
+В файле `banking.py` реализованы три функции:
+
+1. `transfer_funds(from_account, to_account, amount)`
+
+    def transfer_funds(from_account, to_account, amount):
+        """
+        Шаг 4: Функция с обработчиками нескольких типов исключений.
+        """
+        try:
+            if from_account not in accounts:
+                raise AccountNotFoundError(f"Счет отправителя {from_account} не найден.")
+            if to_account not in accounts:
+                raise AccountNotFoundError(f"Счет получателя {to_account} не найден.")
+            if amount <= 0:
+                raise ValueError("Сумма перевода должна быть положительной.")
+            if accounts[from_account]['balance'] < amount:
+                raise InsufficientFundsError("Недостаточно средств для перевода.")
+             Выполнение перевода
+            accounts[from_account]['balance'] -= amount
+            accounts[to_account]['balance'] += amount
+        except AccountNotFoundError as e:
+            print(f"Ошибка счета: {e}")
+             Логика обработки AccountNotFoundError
+        except InsufficientFundsError as e:
+            print(f"Ошибка средств: {e}")
+             Логика обработки InsufficientFundsError
+        except ValueError as e:
+            print(f"Ошибка значения: {e}")
+             Логика обработки ValueError
+        finally:
+             Логика для нормального завершения работы функции
+            print("Попытка перевода завершена.")
+
+
+2. `calculate_interest(account_number, rate)`
+
+    def calculate_interest(account_number, rate):
+        """
+        Шаг 4: Функция с обработчиками нескольких типов исключений.
+        """
+        try:
+            if account_number not in accounts:
+                raise AccountNotFoundError(f"Счет {account_number} не найден.")
+            if not isinstance(rate, (int, float)):
+                raise TypeError("Процентная ставка должна быть числом.")
+            if rate < 0:
+                raise ValueError("Процентная ставка не может быть отрицательной.")
+            interest = accounts[account_number]['balance'] * rate
+            return interest
+        except AccountNotFoundError as e:
+            print(f"Ошибка счета: {e}")
+        except TypeError as e:
+            print(f"Ошибка типа: {e}")
+        except ValueError as e:
+            print(f"Ошибка значения: {e}")
+        finally:
+            print("Расчет процентов завершен.")
+
+
+3. `update_account_limit(account_number, new_limit)`
+
+    def update_account_limit(account_number, new_limit):
+        """
+        Шаг 4: Функция с обработчиками нескольких типов исключений.
+        """
+        try:
+            if account_number not in accounts:
+                raise AccountNotFoundError(f"Счет {account_number} не найден.")
+            if not isinstance(new_limit, (int, float)):
+                raise TypeError("Новый лимит должен быть числом.")
+            if new_limit < 0:
+                raise ValueError("Новый лимит не может быть отрицательным.")
+            accounts[account_number]['limit'] = new_limit
+        except AccountNotFoundError as e:
+            print(f"Ошибка счета: {e}")
+        except TypeError as e:
+            print(f"Ошибка типа: {e}")
+        except ValueError as e:
+            print(f"Ошибка значения: {e}")
+        finally:
+            print("Обновление лимита счета завершено.")
+
+
+
+- Соответствие требованиям:
+    - Количество функций: 3.
+    - Типы исключений: Каждая функция обрабатывает как минимум 3 типа исключений:
+        - `AccountNotFoundError`
+        - `InsufficientFundsError` или `ValueError`
+        - `TypeError` (в двух функциях)
+    - Логика обработки: В каждом `except` блоке реализована соответствующая логика (вывод сообщения).
+    - Блоки `finally`: Присутствуют в каждой функции с логикой нормального завершения (вывод сообщений).
+
+---
+
+ Шаг 5: Функция, которая принимает на вход один или несколько параметров. Функция ДОЛЖНА генерировать исключения при определённых условиях (в Python есть конструкция для генерации исключений). Функция ДОЛЖНА содержать обработчики всех исключений, которые генерируются внутри этой функции. Внутри блоков обработки исключения ДОЛЖНА быть какая-нибудь логика, связанная с обработкой соответствующего типа исключения. Обработчик МОЖЕТ содержать блок finally. Логика внутри блока finally ДОЛЖНА способствовать нормальному завершению работы функции.
+
+ Реализация в коде:
+
+В файле `banking.py` реализована функция:
+
+`close_account(account_number)`
+
+def close_account(account_number):
+    """
+    Шаг 5: Функция, генерирующая исключения с помощью raise и обрабатывающая их.
+    """
+    try:
+        if account_number not in accounts:
+            raise AccountNotFoundError(f"Счет {account_number} не найден.")
+        if accounts[account_number]['balance'] != 0:
+            raise Exception("Баланс счета не равен нулю. Невозможно закрыть счет.")
+         Закрытие счета
+        del accounts[account_number]
+        print(f"Счет {account_number} успешно закрыт.")
+    except AccountNotFoundError as e:
+        print(f"Ошибка счета: {e}")
+    except Exception as e:
+        print(f"Общая ошибка: {e}")
+    finally:
+        print("Процесс закрытия счета завершен.")
+
+
+- Соответствие требованиям:
+    - Функция принимает один параметр `account_number`.
+    - Генерирует исключения:
+        - `AccountNotFoundError` при отсутствии счета.
+        - Общий `Exception` при ненулевом балансе.
+    - Содержит обработчики всех генерируемых исключений:
+        - `except AccountNotFoundError as e`
+        - `except Exception as e`
+    - Внутри каждого обработчика реализована логика (вывод сообщений).
+    - Содержит блок `finally` с логикой нормального завершения (вывод сообщения).
+
+
+---
+
+ Шаг 6: Минимум 3 разные пользовательские исключения и примеры их использования
+
+ Реализация в коде:
+
+В файле `exceptions.py` реализованы четыре пользовательских исключения:
+
+1. `InsufficientFundsError`
+
+    class InsufficientFundsError(Exception):
+        """Вызывается, когда на счете недостаточно средств для транзакции."""
+        pass
+
+
+2. `AccountNotFoundError`
+
+    class AccountNotFoundError(Exception):
+        """Вызывается, когда указанный номер счета не существует."""
+        pass
+
+
+3. `TransactionLimitError`
+
+    class TransactionLimitError(Exception):
+        """Вызывается, когда сумма транзакции превышает установленный лимит."""
+        pass
+
+
+4. `InvalidCredentialsError`
+
+    class InvalidCredentialsError(Exception):
+        """Вызывается при неверных учетных данных для аутентификации."""
+        pass
+
+
+
+- Соответствие требованиям:
+    - Создано четыре пользовательских исключения, что превышает требуемые три.
+    - Каждое исключение соответствует определённой ошибке в контексте банковской системы.
+
+
+---
+
+ Шаг 7: Функция, которая принимает на вход один или несколько параметров. Функция ДОЛЖНА выбрасывать пользовательское исключение, созданное на шаге 6, при определённых значениях входных параметров. Функция ДОЛЖНА содержать МИНИМУМ ОДИН обработчик исключений. Внутри блока обработки исключения ДОЛЖНА быть какая-нибудь логика, связанная с обработкой исключения. Обработчик МОЖЕТ содержать блок finally.
+
+ Реализация в коде:
+
+В файле `banking.py` реализована функция:
+
+`authenticate_user(account_number, password)`
+
+def authenticate_user(account_number, password):
+    """
+    Шаг 7: Функция, выбрасывающая пользовательское исключение и обрабатывающая его.
+    """
+    try:
+        if account_number not in accounts:
+            raise AccountNotFoundError(f"Счет {account_number} не найден.")
+        if passwords.get(account_number) != password:
+            raise InvalidCredentialsError("Неверный пароль.")
+        print("Аутентификация успешна.")
+    except AccountNotFoundError as e:
+        print(f"Ошибка счета: {e}")
+    except InvalidCredentialsError as e:
+        print(f"Ошибка аутентификации: {e}")
+    finally:
+        print("Попытка аутентификации завершена.")
+
+
+
+- Соответствие требованиям:
+    - Функция принимает два параметра: `account_number` и `password`.
+    - Выбрасывает пользовательские исключения:
+        - `AccountNotFoundError` при отсутствии счета.
+        - `InvalidCredentialsError` при неверном пароле.
+    - Содержит минимум один обработчик исключений:
+        - Два `except` блока для конкретных исключений.
+    - Внутри блоков `except` реализована логика обработки (вывод сообщений).
+    - Содержит блок `finally` с логикой завершения (вывод сообщения).
+
+
+---
+
+ Шаг 8: Минимум 3 функции, демонстрирующие работу исключений. Алгоритм функций необходимо придумать самостоятельно
+
+ Реализация в коде:
+
+В файле `banking.py` реализованы три функции:
+
+1. `open_new_account(account_number, initial_deposit)`
+
+    def open_new_account(account_number, initial_deposit):
+        """
+        Шаг 8: Функция, демонстрирующая исключение при создании уже существующего счета.
+        """
+        try:
+            if account_number in accounts:
+                raise Exception("Счет уже существует.")
+            if initial_deposit < 0:
+                raise ValueError("Начальный депозит не может быть отрицательным.")
+            accounts[account_number] = {'balance': initial_deposit, 'limit': 5000}
+            passwords[account_number] = 'password'   Пароль по умолчанию
+            print(f"Счет {account_number} успешно открыт.")
+        except Exception as e:
+            print(f"Ошибка: {e}")
+
+
+2. `change_password(account_number, old_password, new_password)`
+
+    def change_password(account_number, old_password, new_password):
+        """
+        Шаг 8: Функция, демонстрирующая исключение при смене пароля.
+        """
+        try:
+            if account_number not in accounts:
+                raise AccountNotFoundError(f"Счет {account_number} не найден.")
+            if passwords.get(account_number) != old_password:
+                raise InvalidCredentialsError("Неверный старый пароль.")
+            passwords[account_number] = new_password
+            print("Пароль успешно изменен.")
+        except AccountNotFoundError as e:
+            print(f"Ошибка счета: {e}")
+        except InvalidCredentialsError as e:
+            print(f"Ошибка аутентификации: {e}")
+        finally:
+            print("Попытка смены пароля завершена.")
+
+
+3. `apply_loan(account_number, loan_amount)`
+
+    def apply_loan(account_number, loan_amount):
+        """
+        Шаг 8: Функция, демонстрирующая исключение при подаче заявки на кредит.
+        """
+        try:
+            if account_number not in accounts:
+                raise AccountNotFoundError(f"Счет {account_number} не найден.")
+            if loan_amount <= 0:
+                raise ValueError("Сумма кредита должна быть положительной.")
+             Простая логика одобрения кредита
+            if loan_amount > accounts[account_number]['balance'] * 2:
+                raise Exception("Сумма кредита превышает допустимый лимит.")
+            print(f"Кредит на сумму {loan_amount} одобрен для счета {account_number}.")
+        except AccountNotFoundError as e:
+            print(f"Ошибка счета: {e}")
+        except ValueError as e:
+            print(f"Ошибка значения: {e}")
+        except Exception as e:
+            print(f"Ошибка при одобрении кредита: {e}")
+        finally:
+            print("Процесс подачи заявки на кредит завершен.")
+
+
+
+- Соответствие требованиям:
+    - Количество функций: 3.
+    - Типы исключений:
+        - `open_new_account`:
+            - Генерирует общий `Exception` и `ValueError`.
+        - `change_password`:
+            - Генерирует `AccountNotFoundError` и `InvalidCredentialsError`.
+        - `apply_loan`:
+            - Генерирует `AccountNotFoundError`, `ValueError`, и общий `Exception`.
+    - Логика обработки: В каждом `except` блоке реализована соответствующая логика (вывод сообщений).
+    - Блоки `finally`: Присутствуют в двух из трёх функций (`change_password` и `apply_loan`), отсутствует в `open_new_account`. Однако, согласно заданию, блок `finally` является опциональным (МОЖЕТ содержать), поэтому это не является нарушением.
+
+
+---
+
+ Шаг 9: Функция, которая последовательно вызывает ВСЕ вышесозданные функции. Функция ДОЛЖНА завершаться корректно и НЕ ДОЛЖНА иметь необработанных исключений. Функции, созданные в шагах 1-8 ДОЛЖНЫ быть размещены в одном или нескольких отдельных файлах. Функция из шага 9 ДОЛЖНА быть размещена в файле main.py. В файле main.py должна быть конструкция if __name__ == "__main__", внутри которой ДОЛЖНА вызываться функция из шага 9. В комментариях к каждой функции из шагов 1-8 ДОЛЖНО быть отмечено, к какому шагу относится эта функция. КРАЙНЕ ЖЕЛАТЕЛЬНО, чтобы реализуемые функции имитировали какую-то реальную логику, были как-нибудь связаны между собой и содержали как можно меньше искусственных примеров.
+
+ Реализация в коде:
+
+В файле `main.py` реализована функция:
+
+`main_function()`
+
+def main_function():
+    """
+    Шаг 9: Функция, которая последовательно вызывает все созданные ранее функции.
+    """
+    accounts = get_accounts()
+
+     Шаг 1: Функции, выбрасывающие исключения без их обработки
+    print("\n--- Шаг 1: Функции без обработки исключений ---")
+    try:
+        print("Вклад 1000 на счет 12345:")
+        deposit('12345', 1000)
+        print("Новый баланс:", get_account_balance('12345'))
+    except Exception as e:
+        print(e)
+
+    try:
+        print("Снятие 500 со счета 67890:")
+        withdraw('67890', 500)
+        print("Новый баланс:", get_account_balance('67890'))
+    except Exception as e:
+        print(e)
+
+     Шаг 2: Функция с обработчиком общего типа исключений
+    print("\n--- Шаг 2: Функция с общим обработчиком исключений ---")
+    print("Получение баланса для счета 00000 (не существует):")
+    balance = get_account_balance('00000')
+    print("Баланс:", balance)
+
+     Шаг 3: Функция с обработчиком исключений и блоком finally
+    print("\n--- Шаг 3: Функция с обработчиком исключений и блоком finally ---")
+    print("Чтение данных счета для счета 12345:")
+    data = read_account_data('12345')
+    print("Данные счета:", data)
+
+     Шаг 4: Функции с несколькими обработчиками исключений
+    print("\n--- Шаг 4: Функции с несколькими обработчиками исключений ---")
+    print("Перевод 300 со счета 12345 на счет 67890:")
+    transfer_funds('12345', '67890', 300)
+    print("Новый баланс 12345:", get_account_balance('12345'))
+    print("Новый баланс 67890:", get_account_balance('67890'))
+
+    print("Расчет процентов для счета 67890 при ставке 0.05:")
+    interest = calculate_interest('67890', 0.05)
+    print("Проценты:", interest)
+
+    print("Обновление лимита счета 12345 до 10000:")
+    update_account_limit('12345', 10000)
+    print("Новый лимит счета:", accounts['12345']['limit'])
+
+     Шаг 5: Функция, генерирующая и обрабатывающая исключения
+    print("\n--- Шаг 5: Функция, генерирующая и обрабатывающая исключения ---")
+    print("Закрытие счета 00000 (не существует):")
+    close_account('00000')
+
+    print("Закрытие счета 12345 (не удастся, если баланс не равен нулю):")
+    close_account('12345')
+
+     Установка баланса в ноль для успешного закрытия счета
+    accounts['12345']['balance'] = 0
+    close_account('12345')
+
+     Шаг 7: Функция, выбрасывающая пользовательское исключение
+    print("\n--- Шаг 7: Функция, выбрасывающая пользовательское исключение ---")
+    print("Аутентификация пользователя для счета 67890:")
+    authenticate_user('67890', 'password')
+    print("Аутентификация пользователя с неверным паролем:")
+    authenticate_user('67890', 'wrongpassword')
+
+     Шаг 8: Дополнительные функции, демонстрирующие работу исключений
+    print("\n--- Шаг 8: Дополнительные функции ---")
+    print("Открытие нового счета 54321 с начальным депозитом 500:")
+    open_new_account('54321', 500)
+    print("Данные нового счета:", accounts['54321'])
+
+    print("Смена пароля для счета 67890:")
+    change_password('67890', 'password', 'newpassword')
+
+    print("Подача заявки на кредит для счета 67890:")
+    apply_loan('67890', 2000)
+
+    print("Подача заявки на кредит с превышением лимита:")
+    apply_loan('67890', 10000)
+
+     Финальная проверка
+    print("\n--- Финальное состояние счетов ---")
+    print("Счета:", accounts)
+
+
+И конструкция запуска:
+
+
+if __name__ == "__main__":
+    main_function()
+
+
+
+- Соответствие требованиям:
+    - Функция `main_function` последовательно вызывает все функции из шагов 1-8.
+    - Обработка исключений: Вызовы функций из шагов 1-8 обёрнуты в `try-except` блоки там, где это необходимо, что предотвращает необработанные исключения.
+    - Корректное завершение: Все исключения обрабатываются, и функция завершается без необработанных исключений.
+    - Структура файлов: Функции из шагов 1-8 размещены в `banking.py`, а `main_function` — в `main.py`.
+    - Конструкция запуска: В `main.py` присутствует `if __name__ == "__main__":`, внутри которого вызывается `main_function()`.
+    - Комментарии: В каждой функции из шагов 1-8 присутствуют комментарии, указывающие на соответствующий шаг задания.
+
+
+---
+
+
+
+
+
